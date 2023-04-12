@@ -4,9 +4,10 @@ import { useForm } from "react-hook-form";
 
 interface IForm {
   email: string;
+  password: string;
 }
 
-export const Login = () => {
+const Login = () => {
   const {
     register,
     handleSubmit,
@@ -42,8 +43,20 @@ export const Login = () => {
           />
           <span>{errors?.email?.message}</span>
         </div>
+        <div>
+          <label htmlFor="password">Password: </label>
+          <input
+            type="password"
+            {...register("password", {
+              required: "Write your password please.",
+            })}
+          />
+          <span>{errors?.email?.message}</span>
+        </div>
         <button>Login</button>
       </form>
     </div>
   );
 };
+
+export default Login;

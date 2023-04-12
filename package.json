@@ -16,17 +16,23 @@
     "@types/react": "16.9.11",
     "@types/react-dom": "16.9.3",
     "@zeit/next-css": "1.0.1",
+    "bcrypt": "^5.1.0",
     "iron-session": "6.1.3",
     "next": "12.1.6",
+    "postcss": "8.4.14",
     "prisma": "3.15.2",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hook-form": "7.32.2",
     "swr": "1.3.0",
+    "tailwindcss": "3.1.3",
     "ts-node": "10.8.1",
     "typescript": "4.7.4"
   },
   "license": "ISC",
   "keywords": [],
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.0"
+  }
 }

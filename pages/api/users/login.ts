@@ -1,13 +1,15 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { withApiSession } from "../../../lib/withSession";
+import { User } from "../../../lib/user";
 import db from "../../../lib/db";
+import { withApiSession } from "../../../lib/withSession";
+import { NextApiRequest, NextApiResponse } from "next";
 
 async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseType>
 ) {
   if (req.method === "POST") {
-    const { email } = req.body;
+    const { email, password } = req.body;
+
     const user = await db.user.findUnique({
       where: {
         email,
@@ -16,6 +18,14 @@ async function handler(
     if (!user) {
       return res.status(404).end();
     }
+
+    const userInstance = new User(user.email, user.password);
+    const passwordMatch = await userInstance.comparePasswords(password);
+
+    if (!passwordMatch) {
+      return res.status(401).end();
+    }
+
     req.session.user = {
       id: user.id,
     };

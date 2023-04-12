@@ -2,14 +2,15 @@ import { useRouter } from "next/router";
 import React, { useEffect } from "react";
 import useSWR from "swr";
 
-export const Home = () => {
+const Home = () => {
   const router = useRouter();
   const { data, error } = useSWR("/api/users/me");
   useEffect(() => {
     if (error) {
-      router.replace("/create-account");
+      router.replace("/log-in");
     }
   }, [router, error]);
+
   if (!data) {
     return <div />;
   }
@@ -20,3 +21,5 @@ export const Home = () => {
     </div>
   );
 };
+
+export default Home;

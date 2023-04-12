@@ -1,26 +1,33 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { withApiSession } from "../../../lib/withSession";
 import db from "../../../lib/db";
+import { User } from "../../../lib/user";
+import { NextApiRequest, NextApiResponse } from "next";
 
-async function handler(
+export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseType>
 ) {
-  const {
-    session: { user },
-  } = req;
-  if (!user?.id) {
-    return res.status(401).end();
-  }
-  const dbUser = await db.user.findUnique({
-    where: {
-      id: user.id,
-    },
-  });
-  if (!dbUser) {
-    return res.status(404).end();
-  }
-  return res.send({ ...dbUser });
-}
+  if (req.method === "POST") {
+    const { name, email, password } = req.body;
+    const userInfo = new User(email, password);
 
-export default withApiSession(handler);
+    await userInfo.encryptPassword();
+
+    const user = await db.user.findUnique({
+      where: {
+        email,
+      },
+    });
+    if (user) {
+      return res.status(200).end();
+    }
+    await db.user.create({
+      data: {
+        name,
+        email,
+        password: userInfo.getPassword(),
+      },
+    });
+    return res.status(201).end();
+  }
+  return res.status(405).end();
+}

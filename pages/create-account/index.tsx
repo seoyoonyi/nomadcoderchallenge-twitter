@@ -5,9 +5,10 @@ import { useForm } from "react-hook-form";
 interface IForm {
   name: string;
   email: string;
+  password: string;
 }
 
-export const CreateAccount = () => {
+const CreateAccount = () => {
   const {
     register,
     handleSubmit,
@@ -18,6 +19,7 @@ export const CreateAccount = () => {
   const onValid = async (data: IForm) => {
     if (!loading) {
       setLoading(true);
+      console.log(data);
       const request = await fetch("/api/users/create-account", {
         method: "POST",
         headers: {
@@ -25,6 +27,7 @@ export const CreateAccount = () => {
         },
         body: JSON.stringify(data),
       });
+      console.log(request);
       if (request.status === 200) {
         alert("Account already exists! Please log in!");
       }
@@ -32,7 +35,7 @@ export const CreateAccount = () => {
         alert("Account created! Please log in!");
       }
       if (request.status !== 405) {
-        router.push("/login");
+        router.push("/log-in");
       }
 
       setLoading(false);
@@ -58,8 +61,20 @@ export const CreateAccount = () => {
           />
           <span>{errors?.email?.message}</span>
         </div>
+        <div>
+          <label htmlFor="password">Password: </label>
+          <input
+            type="password"
+            {...register("password", {
+              required: "Write your password please.",
+            })}
+          />
+          <span>{errors?.password?.message}</span>
+        </div>
         <button>Create Account</button>
       </form>
     </div>
   );
 };
+
+export default CreateAccount;

@@ -9,8 +9,9 @@ declare module "iron-session" {
 }
 
 const cookieOptions = {
-  cookieName: "carrotsession",
+  cookieName: "next-app-session",
   password: "ThisShouldBeAVeryLongText12345!!!",
+  secure: process.env.NODE_ENV === "production",
 };
 
 export function withApiSession(fn: any) {
