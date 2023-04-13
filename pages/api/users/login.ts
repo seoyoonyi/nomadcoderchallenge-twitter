@@ -1,7 +1,8 @@
-import { User } from "../../../lib/user";
-import db from "../../../lib/db";
-import { withApiSession } from "../../../lib/withSession";
 import { NextApiRequest, NextApiResponse } from "next";
+import db from "@/lib/server/db";
+import { withApiSession } from "@/lib/server/withSession";
+import withHandler, { ResponseType } from "@/lib/server/withHandler";
+import { User } from "@/lib/server/user";
 
 async function handler(
   req: NextApiRequest,
@@ -15,6 +16,7 @@ async function handler(
         email,
       },
     });
+
     if (!user) {
       return res.status(404).end();
     }
@@ -30,9 +32,10 @@ async function handler(
       id: user.id,
     };
     await req.session.save();
-    return res.status(200).end();
+    res.json({ ok: true });
   }
-  return res.status(405).end();
 }
 
-export default withApiSession(handler);
+export default withApiSession(
+  withHandler({ methods: ["POST"], handler, isPrivate: false })
+);

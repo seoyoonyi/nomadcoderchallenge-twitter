@@ -1,8 +1,9 @@
-import db from "../../../lib/db";
-import { User } from "../../../lib/user";
+import db from "@/lib/server/db";
+import { User } from "@/lib/server/user";
+import withHandler, { ResponseType } from "@/lib/server/withHandler";
 import { NextApiRequest, NextApiResponse } from "next";
 
-export default async function handler(
+async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseType>
 ) {
@@ -20,6 +21,7 @@ export default async function handler(
     if (user) {
       return res.status(200).end();
     }
+
     await db.user.create({
       data: {
         name,
@@ -27,7 +29,11 @@ export default async function handler(
         password: userInfo.getPassword(),
       },
     });
-    return res.status(201).end();
+
+    res.json({
+      ok: true,
+    });
   }
-  return res.status(405).end();
 }
+
+export default withHandler({ methods: ["POST"], handler, isPrivate: false });

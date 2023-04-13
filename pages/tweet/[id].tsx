@@ -2,8 +2,7 @@ import React from "react";
 import { useRouter } from "next/router";
 import useSWR from "swr";
 
-import { useSWRConfig } from "swr";
-import fetcher from "../api/fetcher";
+import useMutation from "@/lib/client/useMutation";
 
 // interface ItemDetailResponse {
 //     ok: boolean;
@@ -19,18 +18,12 @@ const TweetDetail = () => {
   const { data, mutate: boundMutate } = useSWR(
     router.query.id ? `/api/tweets/${router.query.id}` : null
   );
+  const { tweet } = data;
   const [toggleFav] = useMutation(`/api/tweets/${router.query.id}/like`);
-  const onFavClick = () => {
+  const handleLike = () => {
     if (!data) return;
-    boundMutate((prev) => prev && { ...prev, isLiked: !prev.isLiked }, false);
-    // mutate("/api/users/me", (prev: any) => ({ ok: !prev.ok }), false);
+    boundMutate((prev: any) => prev && { ...prev, likes: !prev.likes }, false);
     toggleFav({});
-  };
-
-  const handleLike = async () => {
-    // Update like status in the database
-    await fetcher(`/api/tweets/${id}/like`, { method: "PUT" });
-    mutate(); // Update SWR cache to reflect like status
   };
 
   return (

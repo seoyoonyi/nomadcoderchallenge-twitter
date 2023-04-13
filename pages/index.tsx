@@ -1,44 +1,47 @@
+import Header from "@/components/Header";
+import Tweet from "@/components/Tweet";
+import useMutation from "@/lib/client/useMutation";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import useSWR, { useSWRConfig } from "swr";
-import Tweets from "./api/tweets/tweets";
+interface UploadTweetForm {
+  id: number;
+  text: string;
+  likes: boolean;
+}
 
 const Home = () => {
   const router = useRouter();
-  const { data, error } = useSWR("/api/users/me");
-  const [newTweet, setNewTweet] = useState("");
-  const { mutate } = useSWRConfig();
 
-  const handleTweetSubmit = async () => {
-    // POST newTweet to API
-    await fetch("/api/tweets", {
-      method: "POST",
-      body: JSON.stringify({ content: newTweet }),
-    });
-    mutate("/api/tweets"); // Update SWR cache to reflect new tweet
-    setNewTweet("");
+  const { register, handleSubmit } = useForm();
+
+  const [uploadTweet, { loading, data }] = useMutation(`/api/tweets`);
+
+  const onValid = (data: any) => {
+    if (loading) return;
+    uploadTweet(data);
   };
 
   useEffect(() => {
-    if (error) {
-      router.replace("/log-in");
+    if (data?.ok) {
+      router.replace(`/`);
     }
-  }, [router, error]);
+  }, [data, router]);
 
-  if (!data) {
-    return <div />;
-  }
   return (
     <div>
-      <h1>Welcome {data?.name}!</h1>
-      <h3>Your email is: {data?.email}</h3>
-      <input
-        type="text"
-        value={newTweet}
-        onChange={(e) => setNewTweet(e.target.value)}
-      />
-      <button onClick={handleTweetSubmit}>Tweet</button>
-      <Tweets />
+      <Header />
+      <form onSubmit={handleSubmit(onValid)}>
+        <input
+          {...register("text", { required: true })}
+          required
+          name="text"
+          type="text"
+        />
+        <button>{loading ? "Loading..." : "Upload Tweet"} </button>
+      </form>
+      <Tweet />
     </div>
   );
 };

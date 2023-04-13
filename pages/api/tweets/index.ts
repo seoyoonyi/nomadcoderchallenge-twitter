@@ -7,44 +7,47 @@ async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseType>
 ) {
-  const {
-    query: { id },
-    session: { user },
-  } = req;
-  const alreadyExists = await db.like.findFirst({
-    where: {
-      tweetId: +id.toString(),
-      userId: user?.id,
-    },
-  });
-  if (alreadyExists) {
-    await db.like.delete({
-      where: {
-        id: alreadyExists.id,
+  if (req.method === "GET") {
+    const tweets = await db.tweet.findMany({
+      include: {
+        _count: {
+          select: {
+            likes: true,
+          },
+        },
       },
     });
-  } else {
-    await db.like.create({
+    res.json({
+      ok: true,
+      tweets,
+    });
+  }
+
+  if (req.method === "POST") {
+    const {
+      body: { text },
+      session: { user },
+    } = req;
+    const tweet = await db.tweet.create({
       data: {
+        text,
         user: {
           connect: {
             id: user?.id,
           },
         },
-        tweet: {
-          connect: {
-            id: +id.toString(),
-          },
-        },
       },
     });
-  }
-  res.json({ ok: true });
-}
 
+    res.json({
+      ok: true,
+      tweet,
+    });
+  }
+}
 export default withApiSession(
   withHandler({
-    methods: ["POST"],
+    methods: ["GET", "POST"],
     handler,
   })
 );

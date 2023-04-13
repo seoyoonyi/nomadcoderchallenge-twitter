@@ -1,27 +1,24 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import db from "../../../lib/db";
-import { withApiSession } from "../../../lib/withSession";
-import { ResponseType } from "../../../types/types";
+import db from "@/lib/server/db";
+import { withApiSession } from "@/lib/server/withSession";
+import withHandler, { ResponseType } from "@/lib/server/withHandler";
 
 async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseType>
 ) {
-  const {
-    session: { user },
-  } = req;
-  if (!user?.id) {
-    return res.status(401).end();
-  }
-  const dbUser = await db.user.findUnique({
-    where: {
-      id: user.id,
-    },
+  const profile = await db.user.findUnique({
+    where: { id: req.session.user?.id },
   });
-  if (!dbUser) {
-    return res.status(404).end();
-  }
-  return res.send({ ...dbUser });
+  res.json({
+    ok: true,
+    profile,
+  });
 }
 
-export default withApiSession(handler);
+export default withApiSession(
+  withHandler({
+    methods: ["GET"],
+    handler,
+  })
+);
