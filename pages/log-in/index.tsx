@@ -1,3 +1,5 @@
+import useMutation from "@/lib/client/useMutation";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -13,22 +15,16 @@ const Login = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<IForm>();
-  const [loading, setLoading] = useState(false);
+  const [loginMutation, { loading }] = useMutation(`/api/users/login`);
+
   const router = useRouter();
   const onValid = async (data: IForm) => {
-    if (!loading) {
-      const request = await fetch("/api/users/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-      if (request.status === 200) {
-        router.push("/");
-      } else {
-        setLoading(false);
-      }
+    if (loading) return;
+    try {
+      await loginMutation(data);
+      router.push("/");
+    } catch (error) {
+      console.error("Failed to login", error);
     }
   };
   return (
@@ -55,6 +51,7 @@ const Login = () => {
         </div>
         <button>Login</button>
       </form>
+      <Link href={"/create-account"}>회원가입</Link>
     </div>
   );
 };

@@ -1,36 +1,38 @@
-import React from "react";
-import { useRouter } from "next/router";
-
+import React, { useEffect } from "react";
+import { NextRouter, useRouter } from "next/router";
 import useSWR from "swr";
-import useMutation from "@/lib/client/useMutation";
+import useTweetLike from "@/hooks/useTweetLike";
+import { NextPageContext } from "next";
+import Item from "./Item";
 
 interface tweetType {
   id: number;
   text: string;
-  likes: boolean;
+  _count: {
+    likes: number;
+  };
+}
+
+interface TweetProps {
+  tweetId: string | string[];
 }
 
 const Tweet = () => {
-  const router = useRouter();
-
-  const { data } = useSWR(`/api/tweets`);
-
-  if (!data) {
-    return <p>Loading...</p>;
-  }
-
-  console.log("tweet", data);
+  const { data, isValidating } = useSWR(`/api/tweets`);
 
   return (
     <div>
       <h2>Tweets</h2>
       <ul>
-        {data?.tweets?.map((tweet: tweetType) => (
-          <li key={tweet.id}>
-            <p>Tweet content: {tweet.text}</p>
-            <p>Number of likes: {tweet.likes}</p>
-          </li>
-        ))}
+        {isValidating ? (
+          <div>loading</div>
+        ) : (
+          <ul>
+            {data?.tweets?.map(({ id, text, _count: { likes } }: tweetType) => {
+              return <Item text={text} hearts={likes} key={id} id={id} />;
+            })}
+          </ul>
+        )}
       </ul>
     </div>
   );

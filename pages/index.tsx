@@ -13,7 +13,6 @@ interface UploadTweetForm {
 
 const Home = () => {
   const router = useRouter();
-
   const { register, handleSubmit } = useForm();
 
   const [uploadTweet, { loading, data }] = useMutation(`/api/tweets`);
@@ -25,7 +24,7 @@ const Home = () => {
 
   useEffect(() => {
     if (data?.ok) {
-      router.replace(`/`);
+      router.replace(`/tweets/${data.product.id}`);
     }
   }, [data, router]);
 
