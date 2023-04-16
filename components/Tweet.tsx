@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { NextRouter, useRouter } from "next/router";
 import useSWR from "swr";
-import useTweetLike from "@/hooks/useTweetLike";
 import { NextPageContext } from "next";
 import Item from "./Item";
 
@@ -10,6 +9,9 @@ interface tweetType {
   text: string;
   _count: {
     likes: number;
+  };
+  user: {
+    name: string;
   };
 }
 
@@ -21,20 +23,21 @@ const Tweet = () => {
   const { data, isValidating } = useSWR(`/api/tweets`);
 
   return (
-    <div>
-      <h2>Tweets</h2>
-      <ul>
-        {isValidating ? (
-          <div>loading</div>
-        ) : (
-          <ul>
-            {data?.tweets?.map(({ id, text, _count: { likes } }: tweetType) => {
-              return <Item text={text} hearts={likes} key={id} id={id} />;
-            })}
-          </ul>
-        )}
-      </ul>
-    </div>
+    <ul className="w-full mt-5">
+      {isValidating ? (
+        <div>loading</div>
+      ) : (
+        <ul>
+          {data?.tweets?.map(
+            ({ id, text, _count: { likes }, user: { name } }: tweetType) => {
+              return (
+                <Item text={text} hearts={likes} key={id} id={id} name={name} />
+              );
+            }
+          )}
+        </ul>
+      )}
+    </ul>
   );
 };
 

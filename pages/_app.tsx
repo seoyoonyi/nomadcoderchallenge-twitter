@@ -1,5 +1,6 @@
 import { SWRConfig } from "swr";
 import { ReactElement, ComponentType } from "react";
+import "../styles/globals.css";
 
 interface AppProps {
   Component: ComponentType;

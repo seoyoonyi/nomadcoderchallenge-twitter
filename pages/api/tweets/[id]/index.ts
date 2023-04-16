@@ -24,14 +24,17 @@ async function handler(
       },
     },
   });
-  //   const terms = tweets?.name.split(" ").map((word) => ({
-  //     name: {
-  //       contains: word,
-  //     },
-  //   }));
+  const terms = tweet?.user.name.split(" ");
+
   const relatedTweet = await db.tweet.findMany({
     where: {
-      //   OR: terms,
+      OR: terms?.map((word: string) => ({
+        user: {
+          name: {
+            contains: word,
+          },
+        },
+      })),
       AND: {
         id: {
           not: tweet?.id,

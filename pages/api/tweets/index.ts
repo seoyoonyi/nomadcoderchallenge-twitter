@@ -15,6 +15,11 @@ async function handler(
             likes: true,
           },
         },
+        user: {
+          select: {
+            name: true,
+          },
+        },
       },
     });
     res.json({
