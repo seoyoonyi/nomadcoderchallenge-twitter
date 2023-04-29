@@ -18,7 +18,7 @@ const TweetDetail = () => {
   const handleLike = async () => {
     if (!data) return;
     boundMutate(
-      (prev: { likes: any }) => prev && { ...prev, likes: !prev.likes },
+      (prev: { likes: boolean }) => prev && { ...prev, likes: !prev.likes },
       false
     );
     toggleLike({});

@@ -2,25 +2,24 @@ import Header from "@/components/Header";
 import Tweet from "@/components/Tweet";
 import useMutation from "@/lib/client/useMutation";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import React, { MouseEvent, useEffect, useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
 import useSWR, { useSWRConfig } from "swr";
+
 interface UploadTweetForm {
-  id: number;
-  text: string;
-  likes: boolean;
+  text: {};
 }
 
 const Home = () => {
   const router = useRouter();
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit } = useForm<UploadTweetForm>();
 
   const [uploadTweet, { loading: tweetsLoading, data: tweetsData }] =
     useMutation(`/api/tweets`);
   const { data: userData, error: userError } = useSWR("/api/users/me");
   const [logoutMutation, { loading: logoutLoaing }] =
     useMutation(`/api/users/logout`);
-  const handleLogout = ({ e }: any) => {
+  const handleLogout = (e: MouseEvent<HTMLButtonElement>) => {
     e && e.preventDefault();
     if (logoutLoaing) return;
 
@@ -28,7 +27,7 @@ const Home = () => {
     router.push("/log-in");
   };
 
-  const onValid = (data: any) => {
+  const onValid: SubmitHandler<UploadTweetForm> = (data) => {
     if (tweetsLoading) return;
     uploadTweet(data);
   };

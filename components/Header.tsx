@@ -1,7 +1,20 @@
 import Link from "next/link";
-import React from "react";
+import React, { MouseEvent } from "react";
 
-const Header = ({ handleLogout, userData }: any) => {
+interface HeaderProps {
+  handleLogout: (e: MouseEvent<HTMLButtonElement>) => void;
+  userData: {
+    id: number;
+    ok: boolean;
+    name: string;
+    email: string;
+    password: string;
+    createdAt: string;
+    updatedAt: string;
+  };
+}
+
+const Header = ({ handleLogout, userData }: HeaderProps) => {
   return (
     <div className="flex justify-between w-full h-20 px-6 py-2">
       <h1 className="flex justify-center h-full py-4">
@@ -21,7 +34,7 @@ const Header = ({ handleLogout, userData }: any) => {
 
       {userData && userData.ok ? (
         <button
-          className="font-semibold text-blue-500 transition rounded  hover:text-blue-500/75"
+          className="font-semibold text-blue-500 transition rounded hover:text-blue-500/75"
           onClick={handleLogout}
         >
           로그아웃

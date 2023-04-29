@@ -1,8 +1,8 @@
 import useMutation from "@/lib/client/useMutation";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import React, { BaseSyntheticEvent, useEffect } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
 
 interface IForm {
   email: string;
@@ -19,7 +19,7 @@ const Login = () => {
     useMutation(`/api/users/login`);
 
   const router = useRouter();
-  const onValid = (data: IForm, e: any) => {
+  const onValid: SubmitHandler<IForm> = (data, e?: BaseSyntheticEvent) => {
     e && e.preventDefault();
     if (loginLoading) return;
 

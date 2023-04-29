@@ -5,17 +5,17 @@ interface UseMutationState<T> {
   data?: T;
   error?: object;
 }
-type UseMutationResult<T> = [(data: any) => void, UseMutationState<T>];
 
-export default function useMutation<T = any>(
-  url: string
-): UseMutationResult<T> {
+type UseMutationResult<T> = [(data: T) => void, UseMutationState<T>];
+
+export default function useMutation<T>(url: string): UseMutationResult<T> {
   const [state, setState] = useState<UseMutationState<T>>({
     loading: false,
     data: undefined,
     error: undefined,
   });
-  function mutation(data: any) {
+
+  function mutation(data: T) {
     setState((prev) => ({ ...prev, loading: true }));
     fetch(url, {
       method: "POST",
@@ -24,11 +24,17 @@ export default function useMutation<T = any>(
       },
       body: JSON.stringify(data),
     })
-      .then((response) => response.json().catch(() => {}))
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Failed with status ${response.status}`);
+        }
+        return response.json();
+      })
       .then((data) => setState((prev) => ({ ...prev, data, loading: false })))
       .catch((error) =>
         setState((prev) => ({ ...prev, error, loading: false }))
       );
   }
+
   return [mutation, { ...state }];
 }
