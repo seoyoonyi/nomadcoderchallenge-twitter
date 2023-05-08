@@ -1,11 +1,14 @@
 import db from "@/lib/server/db";
 import { NextApiRequest, NextApiResponse } from "next";
 import { withApiSession } from "@/lib/server/withSession";
-import withHandler, { ResponseType } from "@/lib/server/withHandler";
+import withHandler, {
+  ResponseData,
+  ResponseType,
+} from "@/lib/server/withHandler";
 
-async function handler(
+async function handler<T extends ResponseData>(
   req: NextApiRequest,
-  res: NextApiResponse<ResponseType>
+  res: NextApiResponse<ResponseType<T>>
 ) {
   const {
     query: { id },
@@ -55,7 +58,7 @@ async function handler(
     })
   );
 
-  res.json({ ok: true, tweet, likes, relatedTweet });
+  res.json({ ok: true, data: { tweet, likes, relatedTweet } });
 }
 
 export default withApiSession(

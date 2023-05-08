@@ -1,28 +1,33 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
-export interface ResponseType {
-  ok: boolean;
+export interface ResponseData {
   [key: string]: any;
+}
+
+export interface ResponseType<T extends ResponseData> {
+  ok?: boolean;
+  error?: string;
+  data?: T;
 }
 
 type method = "GET" | "POST" | "DELETE";
 
-interface ConfigType {
+interface ConfigType<T extends ResponseData> {
   methods: method[];
-  handler: (req: NextApiRequest, res: NextApiResponse) => void;
+  handler: (req: NextApiRequest, res: NextApiResponse<ResponseType<T>>) => void;
   isPrivate?: boolean;
 }
 
-export default function withHandler({
+export default function withHandler<T extends ResponseData>({
   methods,
   isPrivate = true,
   handler,
-}: ConfigType) {
+}: ConfigType<T>) {
   return async function (
     req: NextApiRequest,
-    res: NextApiResponse
-  ): Promise<any> {
-    if (req.method && !methods.includes(req.method as any)) {
+    res: NextApiResponse<ResponseType<T>>
+  ): Promise<void> {
+    if (req.method && !methods.includes(req.method as method)) {
       return res.status(405).end();
     }
     if (isPrivate && !req.session.user) {
@@ -32,7 +37,9 @@ export default function withHandler({
       await handler(req, res);
     } catch (error) {
       console.log(error);
-      return res.status(500).json({ error });
+      return res.status(500).json({
+        error: "Internal server error",
+      });
     }
   };
 }
